@@ -33,24 +33,33 @@ completed_payments as (
 paid_orders as (
     select 
         orders.id as order_id,
-        orders.user_id    as customer_id,
+        orders.user_id as customer_id,
         orders.order_date as order_placed_at,
         orders.status as order_status,
-        p.total_amount_paid,
-        p.payment_finalized_date,
-        c.first_name    as customer_first_name,
-        c.last_name as customer_last_name
+        completed_payments.total_amount_paid,
+        completed_payments.payment_finalized_date,
+        customers.first_name as customer_first_name,
+        customers.last_name as customer_last_name
     from
         orders
-    left join completed_payments p 
-        on orders.id = p.order_id
-    left join customers c 
-        on orders.user_id = c.id ),
+    left join completed_payments
+        on orders.id = completed_payments.order_id
+    left join customers 
+        on orders.user_id = customers.id ),
 
 final as (
     select
-        p.*,
+        order_id,
+        customer_id,
+        order_placed_at,
+        order_status,
+        total_amount_paid,
+        payment_finalized_date,
+        customer_first_name,
+        customer_last_name,
+        
         row_number() over (order by p.order_id) as transaction_seq,
+        
         row_number() over (partition by customer_id order by p.order_id) as customer_sales_seq,
         
         --new vs returning customer
