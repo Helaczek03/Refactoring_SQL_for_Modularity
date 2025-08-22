@@ -1,0 +1,24 @@
+{%- set payment_methods = ['credit_card', 'coupon', 'bank_transfer', 'gift_card'] -%}
+
+with
+payments as (
+    select * from {{ ref('stg_stripe__payments') }}
+),
+
+pivoted as (
+    select 
+        order_id,
+        {%- for payment_method in payment_methods %}
+
+        sum(case when payment_method = '{{ payment_method }}' then payment_amount else 0 end) as {{ payment_method }}_payment
+
+        {%- if not loop.last -%}
+        ,
+        {%- endif %}
+        {%- endfor %}
+    from payments
+    where payment_status = 'success'
+    group by 1
+)
+
+select * from pivoted
