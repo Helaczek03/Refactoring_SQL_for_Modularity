@@ -39,3 +39,5 @@ models:
   my_new_project:
     staging:
       +schema: staging
+    marts:
+      +materialized: table
