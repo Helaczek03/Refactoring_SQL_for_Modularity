@@ -72,10 +72,10 @@ final as (
 
 select * from final
 
-{% if is_incremental() %}
+--{% if is_incremental() %}
     -- this filter will only be applied on an incremental run
-    where order_placed_at >= (select max(order_placed_at) from {{ this }}) 
-{% endif %}
+--    where order_placed_at >= (select max(order_placed_at) from {{ this }}) 
+--{% endif %}
 
 -- created import CTEs, Logical CTEs, final CTE
 -- changed aliases to fullnames
